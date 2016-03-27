@@ -21,3 +21,25 @@ class Userinfo(db.Model):
 
 
 
+class Wishlist(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    wishurl=db.Column(db.String(1000), unique=False)
+    href=db.Column(db.String(200), unique=False)
+    date=db.Column(db.String(80), unique=False)
+    user_id=db.Column(db.Integer, db.ForeignKey("userinfo.id"))
+    category=db.Column(db.String(80), unique=False)
+    quantity=db.Column(db.String(80), unique=False)
+    description=db.Column(db.String(80), unique=False)
+
+
+    def __init__(self,wishurl,href,date,user_id,category,quantity,description):
+        self.wishurl=wishurl
+        self.href=href
+        self.date=date
+        self.user_id=user_id
+        self.category=category
+        self.quantity=quantity
+        self.description=description
+
+
+
