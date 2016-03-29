@@ -13,28 +13,22 @@
 
 
 <div class="row">
-		<center>
-		<div class="styling"> {{success}}</div>
-		</center>
 		<div class="col l3">&nbsp</div>
-		
+			{{delete}}
 			<div class="col s12 m7 l6">
 	          <div class="card">
 	            <div class="card-image">
 	              <img src="{{href}}">
-	              <span class="card-title">Add to your wishlist</span>
+	              <span class="card-title">Delete from wishlist</span>
 	            </div>
 	             <form method="POST" action="#">
 	            <div class="card-content">
-				{{render_field(form.category)}}
-	            {{render_field(form.description)}}
-	            {{render_field(form.quantity)}}
-	          
+				
 	            </div>
 	            <div class="card-action">
 	            <center>
 	            
-	            	 <input type="submit" value="Save Wish" class="btn">
+	            	 <input type="submit" value="Delete" class="btn">
 	           
 	             
 	              </center>
@@ -49,18 +43,6 @@
 
 
 
-
-<style type="text/css">
-	.styling{
-		color:green;
-		font-size: 40px;
-		font-family: 'Slabo 27px', serif;
-
-	}
-	div .glyph{
-		font-size:60px;
-	}
-</style>
 
 </body>
 </html>

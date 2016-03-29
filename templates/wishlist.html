@@ -6,11 +6,15 @@
 </head>
 <body>
 {% include 'header.html' %}
+<div>
+	<br>
+	<br>
+	<br>
+	<br>
 
-{% if query.href%}
-	{{query.href}}	
-{%else%}
-		<div class="container">
+</div>
+{% if query.none%}
+       <div class="container">
 			<div class="row">
 			<div class="col l2">&nbsp</div>
 		        <div class="col s12 m6 l8">
@@ -20,6 +24,7 @@
 		              <p>You have no wishes as yet! 'click add wish' at the bottom of this card or at the navbar to begin adding!!</p>
 		            </div>
 		            <div class="card-action">
+
 		              <a href="wishlist/add">Add Wish</a>
 		              <a href="#">Logout</a>
 		            </div>
@@ -27,8 +32,56 @@
 		        </div>
 		        <div class="col l2">&nbsp</div>
 		      </div>
-		  </div>
-{%endif%}
+		</div>
 
+{%else%}
+<div class="container">
+<div class="row">
+		{% for i in query%}
+		
+		<div class="col s12 m7 l6">
+          <div class="card">
+            <div class="card-image">
+              <img src="{{i.href}}">
+              <span class="card-title">Add to your wishlist</span>
+            </div>
+            <div class="card-content">
+	             <p class="label">Added on: {{i.date}}</p>
+	             <p class="label">Description: {{i.description}}</p>
+	             <p class="label">Quantity: {{i.quantity}}</p>
+	             <p class="label">Category: {{i.category}}</p>
+            </div>
+            <div class="card-action">
+            <div class="row">
+            <center>
+            	<div class=" col l6"><a href="" class="btn">Share</a></div>
+            	<div class="col l6"><a href="{{url_for('delete',href=i.href)}}" class="btn">Delete</a></div>
+           	</center>
+            </div>
+             
+            </div>
+          </div>
+        </div>
+
+	{%endfor%}
+</div>
+</div>
+{%endif%}
+<style type="text/css">
+	.label{
+		padding:10px;
+		color:gray;
+		font-size: 14px;
+
+	}
+</style>
 </body>
 </html>
+
+
+
+<div class="container">
+<div class="row">
+	
+</div>
+</div>

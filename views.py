@@ -14,13 +14,18 @@ router={'loggedin':''}
 
 @app.route("/", methods=['GET','POST'])
 def home():
+	unique=""
 	form=LoginForm(request.form)
 	if request.method=='POST' and form.validate():
-		todb=Userinfo(form.username.data,form.password.data)
-		db.session.add(todb)
-		db.session.commit()
-		return redirect(url_for('login'))
-	return render_template('index.html',form=form)
+		try:
+			todb=Userinfo(form.username.data,form.password.data)
+			db.session.add(todb)
+			db.session.commit()
+			return redirect(url_for('login'))
+		except:
+			unique="Username is already registered with us"
+			db.session.rollback()
+	return render_template('index.html',form=form,unique=unique)
 
 
 
@@ -47,7 +52,9 @@ def login():
 
 @app.route('/wishlist')
 def wishlist():
-	query=db.session.query(Wishlist).filter_by(user_id=session['user_id']).first()
+	query=db.session.query(Wishlist).filter_by(user_id=session['user_id'])
+	if query.first() is None:
+		query={'none':'none'}
 	return render_template("wishlist.html",user=session['user'],query=query)
 
 
@@ -56,11 +63,9 @@ def wishlist():
 
 @app.route('/wishlist/add',methods=['GET','POST'])
 def addtowishlist():
-	thumbs=[]
 	query=""
 	found=""
 	href=""
-	session['time']=time.strftime("%d/%m/%Y")
 	session['href']=[]
 	form=fetchUrl(request.form)
 	
@@ -68,7 +73,7 @@ def addtowishlist():
 	# 	return redirect(url_for('login'))
 	if request.method=="POST" and form.validate():
 		url=form.query.data
-		session['wishurl']=url
+		session['url']=url
 		fetchurl=urllib.urlopen(url)
 		content=fetchurl.read()
 		fetchurl.close()
@@ -76,7 +81,7 @@ def addtowishlist():
 		for i in soup.find_all('img'):
 			session['href'].append(i.get('src'))
 
-		if len(thumbs)==0:
+		if len(session['href'])==0:
 			found="No suitable Wish item could be found on this page!"
 
 	# if request.method=="POST":
@@ -91,12 +96,24 @@ def added():
 	form=WishInfo(request.form)
 	success=""
 	if request.method=="POST" and form.validate():
-		pass
+		wish=Wishlist(session['url'],href,time.strftime("%d/%m/%Y"),session['user_id'],form.category.data,form.quantity.data,form.description.data)
+		db.session.add(wish)
+		db.session.commit()
+		success='Your wish has been added!'
 	return render_template("added.html",form=form,user=session['user'],href=href,success=success)
 
-@app.route('/wishlist/delete')
+@app.route('/wishlist/delete',methods=['POST','GET'])
 def delete():
-	pass
+	href=request.args.get('href')
+	delete=""
+	if request.method=="POST":
+		query=db.session.query(Wishlist).filter_by(href=href,user_id=session['user_id']).first()
+		db.session.delete(query)
+		db.session.commit()
+		return(redirect(url_for("wishlist")))
+		
+	return render_template('delete.html',href=href,user=session['user'])
+	
 
 @app.route('/wishlist/share')
 def share():
