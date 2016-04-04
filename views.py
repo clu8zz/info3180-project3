@@ -93,7 +93,7 @@ def addtowishlist():
 	# if request.method=="POST":
 	# 	return redirect(url_for('wishlist'))
 
-	return render_template('addtowishlist.html',user=session['user'],form=form,thumbs=session['href'],found=found,test=session['href'])
+	return render_template('addtowishlist.html',user=session['user'],form=form,thumbs=session['href'],found=found)
 
 
 @app.route('/wishlist/added',methods=['POST','GET'])
