@@ -2,7 +2,8 @@ from flask import Flask
 from flask.ext.sqlalchemy import SQLAlchemy
 
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql+psycopg2://postgres:620070733@localhost/wishlist'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql+psycopg2://yweenusrsaztwd:hxek4ZtPr_OAvLtq_zuglz_RbP@ec2-54-235-93-178.compute-1.amazonaws.com:5432/dcp0npa6pu9dbs'
+
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS']=True
 db = SQLAlchemy(app)
 
