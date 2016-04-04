@@ -79,15 +79,21 @@ def addtowishlist():
 		fetchurl.close()
 		soup=BeautifulSoup(content,'html.parser')
 		for i in soup.find_all('img'):
-			session['href'].append(i.get('src'))
+			if str(i.get('src')[-3:])=='gif':
+				continue
+			if str(i.get('src'))[:4]!='http':
+				session['href'].append(session['url'][:-1]+i.get('src'))
+			else:
+				session['href'].append(i.get('src'))
 
 		if len(session['href'])==0:
 			found="No suitable Wish item could be found on this page!"
+		
 
 	# if request.method=="POST":
 	# 	return redirect(url_for('wishlist'))
 
-	return render_template('addtowishlist.html',user=session['user'],form=form,thumbs=session['href'],found=found,test=session)
+	return render_template('addtowishlist.html',user=session['user'],form=form,thumbs=session['href'],found=found,test=session['href'])
 
 
 @app.route('/wishlist/added',methods=['POST','GET'])
