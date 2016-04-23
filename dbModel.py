@@ -1,8 +1,8 @@
 from flask import Flask
 from flask.ext.sqlalchemy import SQLAlchemy
-
+from passlib.apps import custom_app_context as pwd_context
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql+psycopg2://yweenusrsaztwd:hxek4ZtPr_OAvLtq_zuglz_RbP@ec2-54-235-93-178.compute-1.amazonaws.com:5432/dcp0npa6pu9dbs'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql+psycopg2://postgres:620070733@localhost/wishlist'
 
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS']=True
 db = SQLAlchemy(app)
@@ -11,7 +11,6 @@ class Userinfo(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(80), unique=True)
     password = db.Column(db.String(120))
-    
 
     def __init__(self,username,password):
         self.username = username

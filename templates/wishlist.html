@@ -2,7 +2,8 @@
 <html>
 <head>
 	<title></title>
-	<link rel="stylesheet" type="text/css" href="../static/materialize/css/materialize.css">
+	<!-- <link rel="stylesheet" type="text/css" href="../static/materialize/css/materialize.css"> -->
+	<link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='materialize/css/materialize.css') }}">
 </head>
 <body>
 {% include 'header.html' %}
@@ -55,7 +56,7 @@
             <div class="row">
             <center>
             	<div class=" col l6"><a href="" class="btn">Share</a></div>
-            	<div class="col l6"><a href="{{url_for('delete',href=i.href)}}" class="btn">Delete</a></div>
+            	<div class="col l6"><a href="{{url_for('delete',href=i.href,id=userid)}}" class="btn">Delete</a></div>
            	</center>
             </div>
              

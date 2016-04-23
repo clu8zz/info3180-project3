@@ -1,9 +1,10 @@
-from flask import Flask,render_template,request,session,url_for,redirect,g,session
+from flask import Flask,render_template,request,session,url_for,redirect,g,session,jsonify
 import urllib
 from bs4 import BeautifulSoup
 from forms import LoginForm,fetchUrl,WishInfo
 from dbModel import db,Userinfo,Wishlist
 import time
+from passlib.apps import custom_app_context as pwd_context
 
 
 
@@ -12,13 +13,37 @@ app.secret_key="kdsjfiuh&ugiug&&&fkgvi"
 router={'loggedin':''}
 
 
+def hash_password(password):
+        return pwd_context.encrypt(password)
+
+
+
+def verify_password(password,password_hash):
+        return pwd_context.verify(password,password_hash)
+
+@app.route('/testuser/<int:id>')
+def test(id):
+	if id>4:
+		return render_template('django.html')
+	else:
+		return render_template('hevon.html')
+	return str(id)
+
+
+
+@app.route('/user')
+def test2():
+	name=db.session.query(Userinfo).filter_by(username='hevon').first()
+	return redirect(url_for('test',id=name.id))
+
+
 @app.route("/", methods=['GET','POST'])
 def home():
 	unique=""
 	form=LoginForm(request.form)
 	if request.method=='POST' and form.validate():
 		try:
-			todb=Userinfo(form.username.data,form.password.data)
+			todb=Userinfo(form.username.data,hash_password(form.password.data))
 			db.session.add(todb)
 			db.session.commit()
 			return redirect(url_for('login'))
@@ -36,38 +61,39 @@ def login():
 	found=0
 	form=LoginForm(request.form)
 	if request.method=='POST' and form.validate():
-		query=db.session.query(Userinfo).filter_by(username=form.username.data).first()
-		if query is None:
+		name=db.session.query(Userinfo).filter_by(username=form.username.data).first()
+		passFound=verify_password(form.password.data,name.password)
+		if name is None or not(passFound):
 			notUser="Incorrect username/password combination"
 			found+=1
 		if found==0:
 			session['user']=form.username.data
-			session['user_id']=query.id
-			return redirect(url_for('wishlist'))
+			session['user_id']=name.id
+			return redirect(url_for('wishlist',id=name.id))
 	return render_template('login.html',form=form,notUser=notUser)
 
 
 
 
-
-@app.route('/wishlist')
-def wishlist():
+@app.route('/user/<int:id>/wishlist')
+def wishlist(id):
 	query=db.session.query(Wishlist).filter_by(user_id=session['user_id'])
 	if query.first() is None:
 		query={'none':'none'}
-	return render_template("wishlist.html",user=session['user'],query=query)
+	return render_template("wishlist.html",user=session['user'],query=query,userid=session['user_id'])
 
 
 
 
 
-@app.route('/wishlist/add',methods=['GET','POST'])
-def addtowishlist():
+@app.route('/user/<int:id>/wishlist/add',methods=['GET','POST'])
+def addtowishlist(id):
 	query=""
 	found=""
 	href=""
 	session['href']=[]
 	form=fetchUrl(request.form)
+	x=3
 	
 	# if router['loggedin']=='':
 	# 	return redirect(url_for('login'))
@@ -82,7 +108,9 @@ def addtowishlist():
 			if str(i.get('src')[-3:])=='gif':
 				continue
 			if str(i.get('src'))[:4]!='http':
-				session['href'].append(session['url'][:-1]+i.get('src'))
+				x=x+session['url'].find('com')
+				session['url']=session['url'][:x]
+				session['href'].append(session['url']+i.get('src'))
 			else:
 				session['href'].append(i.get('src'))
 
@@ -93,11 +121,11 @@ def addtowishlist():
 	# if request.method=="POST":
 	# 	return redirect(url_for('wishlist'))
 
-	return render_template('addtowishlist.html',user=session['user'],form=form,thumbs=session['href'],found=found)
+	return render_template('addtowishlist.html',user=session['user'],form=form,thumbs=session['href'],found=found,userid=session['user_id'])
 
 
-@app.route('/wishlist/added',methods=['POST','GET'])
-def added():
+@app.route('/user/<int:id>/wishlist/added',methods=['POST','GET'])
+def added(id):
 	href=request.args.get('href')
 	form=WishInfo(request.form)
 	success=""
@@ -106,19 +134,21 @@ def added():
 		db.session.add(wish)
 		db.session.commit()
 		success='Your wish has been added!'
-	return render_template("added.html",form=form,user=session['user'],href=href,success=success)
+		return redirect(url_for('wishlist',id=name.id))
+	return render_template("added.html",form=form,user=session['user'],href=href,success=success,userid=session['user_id'])
 
-@app.route('/wishlist/delete',methods=['POST','GET'])
-def delete():
+
+@app.route('/user/<int:id>/wishlist/delete',methods=['POST','GET'])
+def delete(id):
 	href=request.args.get('href')
 	delete=""
 	if request.method=="POST":
 		query=db.session.query(Wishlist).filter_by(href=href,user_id=session['user_id']).first()
 		db.session.delete(query)
 		db.session.commit()
-		return(redirect(url_for("wishlist")))
+		return(redirect(url_for("wishlist",id=id)))
 		
-	return render_template('delete.html',href=href,user=session['user'])
+	return render_template('delete.html',href=href,user=session['user'],userid=session['user_id'])
 	
 
 @app.route('/wishlist/share')

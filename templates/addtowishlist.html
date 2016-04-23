@@ -2,7 +2,7 @@
 <html>
 <head>
 	<title>Flask Wishlist</title>
-	<link rel="stylesheet" type="text/css" href="../static/materialize/css/materialize.css">
+	<link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='materialize/css/materialize.css') }}">
 </head>
 <body>
 	{% include 'header.html' %}
@@ -35,7 +35,7 @@
             <div class="card-content">
             </div>
             <div class="card-action">
-              <a href="{{url_for('added',href=i)}}">Add to wishlist</a>
+              <a href="{{url_for('added',href=i,id=userid)}}">Add to wishlist</a>
             </div>
           </div>
         </div>
